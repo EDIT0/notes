@@ -79,3 +79,30 @@ val number: Int? = user as? Int   // 캐스팅 실패 → null 반환 (예외 �
 - **Java 상호운용성 / 플랫폼 타입** : Java 타입 시스템엔 null 안전성이 없어서, Kotlin이 Java 메서드의 반환값을 받을 때 nullable 여부를 알 수 없음 → 이런 값은 **플랫폼 타입**(IDE에서 `String!`처럼 표시)으로 취급됨
   - 개발자가 nullable(`String?`)로 볼지 non-null(`String`)로 볼지 직접 선택해야 함
   - `@NonNull`/`@Nullable` 같은 어노테이션이 명시돼 있지 않다면, **Java에서 오는 값은 기본적으로 nullable로 취급**하는 게 안전 (아니면 런타임에 NPE 발생 가능)
+
+---
+
+## 🔑 정리: 특징 · 장단점 · 예시
+
+### 특징
+- nullable 여부가 타입 시스템에 포함되어, 컴파일러가 null 관련 코드를 강제로 검사함
+- `?.`, `?:`, `!!`, `as?`, 스마트 캐스트 등 nullable을 다루는 전용 연산자/문법이 풍부함
+- Java처럼 nullability 정보가 없는 코드와 연동할 때는 "플랫폼 타입"으로 유연하게 처리
+
+### 장점
+- NPE를 런타임이 아니라 **컴파일 타임**에 방지 → 버그를 훨씬 빨리 발견
+- nullable 여부가 타입에 그대로 드러나 코드만 봐도 의도가 명확해짐
+- `?.` + `?:` 조합으로 장황한 if-null 체크 없이 간결하게 처리 가능
+
+### 단점
+- `!!`를 습관적으로 쓰면 NPE 위험이 그대로 되살아남 (Kotlin이 막아준 걸 다시 뚫는 셈)
+- nullable 체인이 깊어지면(`a?.b?.c?.d`) 가독성이 떨어질 수 있음
+- Java 상호운용 시 플랫폼 타입 때문에 여전히 런타임 NPE 가능성이 남음
+
+### 예시
+```kotlin
+fun greet(user: User?): String {
+    // 안전 호출 + 엘비스를 함께 써서 null까지 한 줄로 처리
+    return user?.name?.takeIf { it.isNotBlank() } ?: "Guest"
+}
+```

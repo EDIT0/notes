@@ -66,3 +66,26 @@ val x: String = if (condition) "ok" else throw RuntimeException()
 
   - `Nothing`을 반환하는 함수 호출 직후의 코드는 컴파일러가 **도달 불가능**하다고 판단 (더 똑똑한 타입 추론/분석 가능)
   - `List<Nothing>`은 요소가 하나도 없음이 보장되므로 `List<String>`, `List<Int>` 등 어떤 `List<T>`에도 안전하게 대입 가능
+
+---
+
+## 🔑 정리: 특징 · 장단점 · 예시
+
+### 특징
+- `Any`/`Unit`/`Nothing`은 각각 타입 계층의 최상위 / "반환값 없음" / 최하위를 나타내는 특수 타입
+- 셋 다 "값이 거의 모든 것을 담을 수 있다"와 "값이 절대 존재할 수 없다"는 양 극단과 그 중간을 표현
+
+### 장점
+- `Any`로 어떤 타입이든 받는 범용 함수를 작성할 수 있음 (ex. 로깅 함수)
+- `Unit`은 실제 타입이라 제네릭과 자연스럽게 어울림 (Java `void`로는 불가능)
+- `Nothing`을 반환 타입으로 쓰면 "이 함수는 절대 정상 종료하지 않는다"를 컴파일러에게 알려 더 똑똑한 타입 추론이 가능해짐
+
+### 단점
+- `Any`를 남용하면 타입 정보가 사라져, 구체적인 타입이나 sealed class를 쓰는 것보다 타입 안전성이 떨어짐
+- `Nothing`은 직접 선언할 일이 거의 없고 개념이 추상적이라 처음엔 "왜 필요한지" 체감하기 어려움
+
+### 예시
+```kotlin
+fun requireNonEmpty(value: String?): String =
+    value?.takeIf { it.isNotEmpty() } ?: error("value must not be empty")   // error()는 Nothing을 반환
+```

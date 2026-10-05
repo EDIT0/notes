@@ -83,3 +83,30 @@ val negative = positive.copy(number = -1)
     - `copy()` + 기본값 처리를 위한 synthetic `copy$default()`
     - 프로퍼티 기반 `toString()`, `hashCode()`, `equals()`
   - 즉 data class는 마법이 아니라, 컴파일러가 이 모든 보일러플레이트 코드를 대신 만들어주는 것뿐
+
+---
+
+## 🔑 정리: 특징 · 장단점 · 예시
+
+### 특징
+- 데이터 보관을 목적으로 하는 클래스에 특화되어, `equals`/`hashCode`/`toString`/`copy`/`componentN`을 컴파일러가 자동 생성
+- 주 생성자에 최소 1개의 프로퍼티가 필요하며, `abstract`/`open`/`sealed`/`inner`는 사용할 수 없음
+
+### 장점
+- 반복적인 보일러플레이트 코드를 작성할 필요가 없음
+- 값 기반 비교(`==`)와 읽기 좋은 `toString()`으로 디버깅/로깅이 쉬워짐
+- 구조 분해(`val (a, b) = obj`)로 여러 값을 한 번에 꺼내 쓰기 편함
+
+### 단점
+- 다른 클래스를 상속할 수 없음 (상속 관련 KEEP 제안이 아직 논의 중)
+- `copy()`가 있어서 "불변"이라는 개념이 완전하지는 않음 — 언제든 값을 바꾼 새 인스턴스를 만들 수 있음
+- 프로퍼티가 많아지면 생성자 매개변수가 길어지고, `var` 프로퍼티를 섞으면 구조적 동등성 비교를 예측하기 어려워질 수 있음
+
+### 예시
+```kotlin
+data class Point(val x: Int, val y: Int)
+
+val p1 = Point(0, 0)
+val p2 = p1.copy(x = 10)    // y는 그대로, x만 바꾼 새 인스턴스
+println(p1 == Point(0, 0)) // true: 구조적 동등성
+```
